@@ -28,6 +28,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     public enum ExpandingDirection {
         case top
         case bottom
+        case left
     }
     
     public enum MenuTitleDirection {
@@ -36,6 +37,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     // MARK: Public Properties
+    open var menuAnimationDuration: CFTimeInterval = 0.35
     open var menuItemMargin: CGFloat = 16.0
     
     open var allowSounds: Bool = true {
@@ -120,10 +122,13 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             // Congifure center button
             //
             self.centerButton = UIButton(frame: CGRect(x: 0.0, y: 0.0, width: centerButtonSize.width, height: centerButtonSize.height))
-            self.centerButton.setImage(self.centerImage, for: UIControlState())
-            self.centerButton.setImage(self.centerHighlightedImage, for: UIControlState.highlighted)
-            self.centerButton.addTarget(self, action: #selector(centerButtonTapped), for: UIControlEvents.touchDown)
+            self.centerButton.setImage(self.centerImage, for: .normal)
+            self.centerButton.setImage(self.centerHighlightedImage, for: .highlighted)
+            self.centerButton.addTarget(self, action: #selector(centerButtonTapped), for: .touchDown)
             self.centerButton.center = CGPoint(x: self.frame.width / 2.0, y: self.frame.height / 2.0)
+            centerButton.contentHorizontalAlignment = .fill
+            centerButton.contentVerticalAlignment = .fill
+            centerButton.imageView?.contentMode = .scaleAspectFit
             self.addSubview(self.centerButton)
             
             // Configure bottom view
@@ -244,22 +249,27 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     // MARK: - Calculate The Distance From Center Button
-    fileprivate func makeDistanceFromCenterButton(_ itemSize: CGSize, lastDisance: CGFloat, lastItemSize: CGSize) -> CGFloat {
-        return lastDisance + itemSize.height / 2.0 + self.menuItemMargin + lastItemSize.height / 2.0
+    fileprivate func makeDistanceFromCenterButton(_ itemSize: CGSize, lastDistance: CGFloat, lastItemSize: CGSize) -> CGFloat {
+        return lastDistance + itemSize.height / 2.0 + self.menuItemMargin + lastItemSize.height / 2.0
     }
     
     // MARK: - Caculate The Item's End Point
     fileprivate func makeEndPoint(_ itemExpandRadius: CGFloat, angle: CGFloat) -> CGPoint {
-        switch self.expandingDirection {
+        switch expandingDirection {
         case .top:
             return CGPoint(
-                x: self.centerButton.center.x + CGFloat(cosf((Float(angle) + 1.0) * Float.pi)) * itemExpandRadius,
-                y: self.centerButton.center.y + CGFloat(sinf((Float(angle) + 1.0) * Float.pi)) * itemExpandRadius
+                x: centerButton.center.x + CGFloat(cosf((Float(angle) + 1.0) * Float.pi)) * itemExpandRadius,
+                y: centerButton.center.y + CGFloat(sinf((Float(angle) + 1.0) * Float.pi)) * itemExpandRadius
             )
         case .bottom:
             return CGPoint(
-                x: self.centerButton.center.x + CGFloat(cosf(Float(angle) * Float.pi)) * itemExpandRadius,
-                y: self.centerButton.center.y + CGFloat(sinf(Float(angle) * Float.pi)) * itemExpandRadius
+                x: centerButton.center.x + CGFloat(cosf(Float(angle) * Float.pi)) * itemExpandRadius,
+                y: centerButton.center.y + CGFloat(sinf(Float(angle) * Float.pi)) * itemExpandRadius
+            )
+        case .left:
+            return CGPoint(
+                x: centerButton.center.x + CGFloat(cosf((Float(90) + 1.0) * Float.pi)) * itemExpandRadius,
+                y: centerButton.center.y + CGFloat(sinf((Float(90) + 1.0) * Float.pi)) * itemExpandRadius
             )
         }
     }
@@ -279,7 +289,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         var lastItemSize: CGSize = self.centerButton.bounds.size
         
         for item in self.menuItems {
-            let distance: CGFloat = self.makeDistanceFromCenterButton(item.bounds.size, lastDisance: lastDistance, lastItemSize: lastItemSize)
+            let distance: CGFloat = self.makeDistanceFromCenterButton(item.bounds.size, lastDistance: lastDistance, lastItemSize: lastItemSize)
             lastDistance = distance
             lastItemSize = item.bounds.size
             let backwardPoint: CGPoint = self.makeEndPoint(distance + 5.0, angle: currentAngle / 180.0)
@@ -312,14 +322,14 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     fileprivate func resizeToFoldedFrame(completion: (() -> Void)?) {
         if self.enabledFoldingAnimations.contains(.MenuButtonRotation) == true {
-            UIView.animate(withDuration: 0.0618 * 3, delay: 0.0618 * 2, options: UIViewAnimationOptions.curveEaseIn, animations: { () -> Void in
+            UIView.animate(withDuration: 0.0618 * 3, delay: 0.0618 * 2, options: .curveEaseIn, animations: { () -> Void in
                 self.centerButton.transform = CGAffineTransform(rotationAngle: 0.0)
                 }, completion: nil)
         } else {
             self.centerButton.transform = CGAffineTransform(rotationAngle: 0.0)
         }
         
-        UIView.animate(withDuration: 0.15, delay: 0.35, options: UIViewAnimationOptions.curveLinear, animations: { () -> Void in
+        UIView.animate(withDuration: 0.15, delay: 0.35, options: .curveLinear, animations: { () -> Void in
             self.bottomView.alpha = 0.0
             }, completion: { (finished) -> Void in
                 // Remove the items from the superview
@@ -342,9 +352,10 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     fileprivate func makeFoldAnimation(startingPoint: CGPoint, backwardPoint: CGPoint, endPoint: CGPoint) -> CAAnimationGroup {
+        let animationDuration = menuAnimationDuration
         let animationGroup: CAAnimationGroup = CAAnimationGroup()
         animationGroup.animations = []
-        animationGroup.duration = 0.35
+        animationGroup.duration = animationDuration
         
         // 1.Configure rotation animation
         //
@@ -352,7 +363,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             let rotationAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, Double.pi, Double.pi * 2.0]
             rotationAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
-            rotationAnimation.duration = 0.35
+            rotationAnimation.duration = animationDuration
             
             animationGroup.animations?.append(rotationAnimation)
         }
@@ -388,7 +399,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         movingAnimation.path = path
-        movingAnimation.duration = 0.35
+        movingAnimation.duration = animationDuration
         
         animationGroup.animations?.append(movingAnimation)
         
@@ -398,7 +409,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             let fadeAnimation = CAKeyframeAnimation(keyPath: "opacity")
             fadeAnimation.values = [1.0, 0.0]
             fadeAnimation.keyTimes = [0.0, 0.75, 1.0]
-            fadeAnimation.duration = 0.35
+            fadeAnimation.duration = animationDuration
             animationGroup.animations?.append(fadeAnimation)
         }
         
@@ -411,7 +422,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         self.willPresentMenuItems?(self)
         self.isAnimating = false
         
-        if self.allowSounds == true {
+        if self.allowSounds {
             AudioServicesPlaySystemSound(self.expandingSound)
         }
         
@@ -429,13 +440,13 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         
         self.insertSubview(self.bottomView, belowSubview: self.centerButton)
         
-        // 3. Excute the bottom view alpha animation
+        // 3. bottom view alpha animation
         //
-        UIView.animate(withDuration: 0.0618 * 3, delay: 0.0, options: UIViewAnimationOptions.curveEaseIn, animations: { () -> Void in
+        UIView.animate(withDuration: 0.0618 * menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
             self.bottomView.alpha = self.bottomViewAlpha
             }, completion: nil)
         
-        // 4. Excute the center button rotation animation
+        // 4. center button rotation animation
         //
         if self.enabledExpandingAnimations.contains(.MenuButtonRotation) == true {
             UIView.animate(withDuration: 0.1575, animations: { () -> Void in
@@ -445,7 +456,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             self.centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
         }
         
-        // 5. Excute the expanding animation
+        // 5. expanding animation
         //
         let currentAngle: CGFloat = 90.0
         
@@ -466,12 +477,12 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             
             // 2. Excute expand animation
             //
-            let distance: CGFloat = self.makeDistanceFromCenterButton(item.bounds.size, lastDisance: lastDistance, lastItemSize: lastItemSize)
+            let distance: CGFloat = self.makeDistanceFromCenterButton(item.bounds.size, lastDistance: lastDistance, lastItemSize: lastItemSize)
             lastDistance = distance
             lastItemSize = item.bounds.size
-            let endPoint: CGPoint = self.makeEndPoint(distance, angle: currentAngle / 180.0)
-            let farPoint: CGPoint = self.makeEndPoint(distance + 10.0, angle: currentAngle / 180.0)
-            let nearPoint: CGPoint = self.makeEndPoint(distance - 5.0, angle: currentAngle / 180.0)
+            let endPoint: CGPoint = makeEndPoint(distance, angle: currentAngle / 180.0)
+            let farPoint: CGPoint = makeEndPoint(distance + 10.0, angle: currentAngle / 180.0)
+            let nearPoint: CGPoint = makeEndPoint(distance - 5.0, angle: currentAngle / 180.0)
             
             let expandingAnimation: CAAnimationGroup = self.makeExpandingAnimation(startingPoint: item.center, farPoint: farPoint, nearPoint: nearPoint, endPoint: endPoint)
             
@@ -517,16 +528,17 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     fileprivate func makeExpandingAnimation(startingPoint: CGPoint, farPoint: CGPoint, nearPoint: CGPoint, endPoint: CGPoint) -> CAAnimationGroup {
+        let animationDuration = menuAnimationDuration - 0.5 // 0.3
         let animationGroup: CAAnimationGroup = CAAnimationGroup()
         animationGroup.animations = []
-        animationGroup.duration = 0.3
+        animationGroup.duration = animationDuration
         
         // 1.Configure rotation animation
         //
         if self.enabledExpandingAnimations.contains(.MenuItemRotation) == true {
             let rotationAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, -Double.pi, -Double.pi * 1.5, -Double.pi  * 2.0]
-            rotationAnimation.duration = 0.3
+            rotationAnimation.duration = animationDuration
             rotationAnimation.keyTimes = [0.0, 0.3, 0.6, 1.0]
             
             animationGroup.animations?.append(rotationAnimation)
@@ -564,7 +576,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         movingAnimation.path = path
-        movingAnimation.duration = 0.3
+        movingAnimation.duration = animationDuration
         
         animationGroup.animations?.append(movingAnimation)
         
@@ -573,7 +585,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         if self.enabledExpandingAnimations.contains(.MenuItemFade) {
             let fadeAnimation = CAKeyframeAnimation(keyPath: "opacity")
             fadeAnimation.values = [0.0, 1.0]
-            fadeAnimation.duration = 0.3
+            fadeAnimation.duration = animationDuration
             animationGroup.animations?.append(fadeAnimation)
         }
         

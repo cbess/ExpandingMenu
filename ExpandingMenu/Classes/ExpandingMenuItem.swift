@@ -54,7 +54,7 @@ open class ExpandingMenuItem: UIView {
     fileprivate var tappedAction: (() -> Void)?
     
     // MARK: - Initializer
-    public init(size: CGSize?, title: String? = nil, titleColor: UIColor? = nil, image: UIImage, highlightedImage: UIImage, backgroundImage: UIImage?, backgroundHighlightedImage: UIImage?, itemTapped: (() -> Void)?) {
+    public init(size: CGSize?, title: String? = nil, titleColor: UIColor? = nil, image: UIImage, highlightedImage: UIImage?, backgroundImage: UIImage?, backgroundHighlightedImage: UIImage?, itemTapped: (() -> Void)?) {
         
         // Initialize properties
         //
@@ -79,8 +79,13 @@ open class ExpandingMenuItem: UIView {
         // Configure base button
         //
         let baseButton = UIButton()
-        baseButton.setImage(backgroundImage, for: UIControlState())
-        baseButton.setImage(backgroundHighlightedImage, for: UIControlState.highlighted)
+        if let backgroundImage = backgroundImage {
+            baseButton.setImage(backgroundImage, for: .normal)
+            baseButton.setImage(backgroundHighlightedImage, for: .highlighted)
+        } else {
+            baseButton.frame = itemFrame
+        }
+        
         baseButton.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(baseButton)
         
@@ -89,14 +94,13 @@ open class ExpandingMenuItem: UIView {
         self.addConstraint(NSLayoutConstraint(item: baseButton, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0))
         self.addConstraint(NSLayoutConstraint(item: baseButton, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0))
         
-        
         // Add an action for the item
         //
         baseButton.addTarget(self, action: #selector(tapped), for: UIControlEvents.touchUpInside)
         
         // Configure front images
         //
-        self.frontImageView.contentMode = .center
+        //self.frontImageView.contentMode = .center
         self.frontImageView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(self.frontImageView)
         
@@ -120,7 +124,7 @@ open class ExpandingMenuItem: UIView {
         self.init(size: nil, title: title, titleColor: titleColor, image: image, highlightedImage: highlightedImage, backgroundImage: backgroundImage, backgroundHighlightedImage: backgroundHighlightedImage, itemTapped: itemTapped)
     }
     
-    public convenience init(size: CGSize, image: UIImage, highlightedImage: UIImage, backgroundImage: UIImage?, backgroundHighlightedImage: UIImage?, itemTapped: (() -> Void)?) {
+    public convenience init(size: CGSize, image: UIImage, highlightedImage: UIImage? = nil, backgroundImage: UIImage? = nil, backgroundHighlightedImage: UIImage? = nil, itemTapped: (() -> Void)?) {
         self.init(size: size, title: nil, image: image, highlightedImage: highlightedImage, backgroundImage: backgroundImage, backgroundHighlightedImage: backgroundHighlightedImage, itemTapped: itemTapped)
     }
     
