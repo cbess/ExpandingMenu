@@ -11,20 +11,20 @@ open class ExpandingMenuItem: UIView {
     
     open var title: String? {
         get {
-            return self.titleButton?.titleLabel?.text
+            return titleButton?.titleLabel?.text
         }
         
         set {
             if let title = newValue {
-                if let titleButton = self.titleButton {
+                if let titleButton = titleButton {
                     titleButton.setTitle(title, for: UIControlState())
                 } else {
-                    self.titleButton = self.createTitleButton(title, titleColor: self.titleColor)
+                    titleButton = createTitleButton(title, titleColor: titleColor)
                 }
                 
-                self.titleButton?.sizeToFit()
+                titleButton?.sizeToFit()
             } else {
-                self.titleButton = nil
+                titleButton = nil
             }
         }
     }
@@ -33,17 +33,17 @@ open class ExpandingMenuItem: UIView {
     
     open var titleColor: UIColor? {
         get {
-            return self.titleButton?.titleColor(for: UIControlState())
+            return titleButton?.titleColor(for: UIControlState())
         }
         
         set {
-            self.titleButton?.setTitleColor(newValue, for: UIControlState())
+            titleButton?.setTitleColor(newValue, for: UIControlState())
         }
     }
     
     var titleTappedActionEnabled: Bool = true {
         didSet {
-            self.titleButton?.isUserInteractionEnabled = titleTappedActionEnabled
+            titleButton?.isUserInteractionEnabled = titleTappedActionEnabled
         }
     }
     
@@ -58,8 +58,8 @@ open class ExpandingMenuItem: UIView {
         
         // Initialize properties
         //
-        self.frontImageView = UIImageView(image: image, highlightedImage: highlightedImage)
-        self.tappedAction = itemTapped
+        frontImageView = UIImageView(image: image, highlightedImage: highlightedImage)
+        tappedAction = itemTapped
         
         // Configure frame
         //
@@ -87,12 +87,12 @@ open class ExpandingMenuItem: UIView {
         }
         
         baseButton.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(baseButton)
+        addSubview(baseButton)
         
-        self.addConstraint(NSLayoutConstraint(item: baseButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0))
-        self.addConstraint(NSLayoutConstraint(item: baseButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0))
-        self.addConstraint(NSLayoutConstraint(item: baseButton, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0))
-        self.addConstraint(NSLayoutConstraint(item: baseButton, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: baseButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: baseButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: baseButton, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: baseButton, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0))
         
         // Add an action for the item
         //
@@ -100,19 +100,19 @@ open class ExpandingMenuItem: UIView {
         
         // Configure front images
         //
-        //self.frontImageView.contentMode = .center
-        self.frontImageView.translatesAutoresizingMaskIntoConstraints = false
-        self.addSubview(self.frontImageView)
+        //frontImageView.contentMode = .center
+        frontImageView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(frontImageView)
         
-        self.addConstraint(NSLayoutConstraint(item: self.frontImageView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0))
-        self.addConstraint(NSLayoutConstraint(item: self.frontImageView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0))
-        self.addConstraint(NSLayoutConstraint(item: self.frontImageView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0))
-        self.addConstraint(NSLayoutConstraint(item: self.frontImageView, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: frontImageView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: frontImageView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: frontImageView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0))
+        addConstraint(NSLayoutConstraint(item: frontImageView, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0))
         
         // Configure title button
         //
         if let title = title {
-            self.titleButton = self.createTitleButton(title, titleColor: titleColor)
+            titleButton = createTitleButton(title, titleColor: titleColor)
         }
     }
     
@@ -129,7 +129,7 @@ open class ExpandingMenuItem: UIView {
     }
     
     required public init?(coder aDecoder: NSCoder) {
-        self.frontImageView = UIImageView()
+        frontImageView = UIImageView()
         
         super.init(coder: aDecoder)
     }
@@ -148,7 +148,7 @@ open class ExpandingMenuItem: UIView {
     
     // MARK: - Tapped Action
     func tapped() {
-        self.delegate?.menuItemTapped(self)
-        self.tappedAction?()
+        delegate?.menuItemTapped(self)
+        tappedAction?()
     }
 }

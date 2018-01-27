@@ -24,7 +24,7 @@ class ViewController: UIViewController {
     }
 
     fileprivate func configureExpandingMenuButton() {
-        let menuButtonSize: CGSize = CGSize(width: 40, height: 40)
+        var menuButtonSize: CGSize = CGSize(width: 55, height: 55)
         let menuButton = ExpandingMenuButton(frame: CGRect(origin: CGPoint.zero, size: menuButtonSize), centerImage: #imageLiteral(resourceName: "chooser-button-tab"), centerHighlightedImage: #imageLiteral(resourceName: "chooser-button-tab-highlighted"))
         menuButton.center = CGPoint(x: self.view.bounds.width - 32.0, y: self.view.bounds.height - 72.0)
         menuButton.expandingDirection = .left
@@ -38,6 +38,9 @@ class ViewController: UIViewController {
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
             self.present(alert, animated: true, completion: nil)
         }
+        
+        menuButtonSize.width -= 5
+        menuButtonSize.height -= 5
         
         let item1 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-music")) {
             showAlert("Music")
