@@ -63,14 +63,14 @@ open class ExpandingMenuItem: UIView {
         
         // Configure frame
         //
-        let itemFrame: CGRect
-        if let itemSize = size , itemSize != CGSize.zero {
-            itemFrame = CGRect(x: 0.0, y: 0.0, width: itemSize.width, height: itemSize.height)
+        var itemFrame: CGRect = .zero
+        if let itemSize = size, itemSize != CGSize.zero {
+            itemFrame.size = itemSize
         } else {
-            if let bgImage = backgroundImage , backgroundHighlightedImage != nil {
-                itemFrame = CGRect(x: 0.0, y: 0.0, width: bgImage.size.width, height: bgImage.size.height)
+            if let bgImage = backgroundImage, backgroundHighlightedImage != nil {
+                itemFrame.size = bgImage.size
             } else {
-                itemFrame = CGRect(x: 0.0, y: 0.0, width: image.size.width, height: image.size.height)
+                itemFrame.size = image.size
             }
         }
         
@@ -89,10 +89,12 @@ open class ExpandingMenuItem: UIView {
         baseButton.translatesAutoresizingMaskIntoConstraints = false
         addSubview(baseButton)
         
-        addConstraint(NSLayoutConstraint(item: baseButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: baseButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: baseButton, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: baseButton, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0))
+        addConstraints([
+            NSLayoutConstraint(item: baseButton, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: baseButton, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: baseButton, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: baseButton, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0)
+            ])
         
         // Add an action for the item
         //
@@ -104,10 +106,12 @@ open class ExpandingMenuItem: UIView {
         frontImageView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(frontImageView)
         
-        addConstraint(NSLayoutConstraint(item: frontImageView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: frontImageView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: frontImageView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0))
-        addConstraint(NSLayoutConstraint(item: frontImageView, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0))
+        addConstraints([
+            NSLayoutConstraint(item: frontImageView, attribute: .top, relatedBy: .equal, toItem: self, attribute: .top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: frontImageView, attribute: .bottom, relatedBy: .equal, toItem: self, attribute: .bottom, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: frontImageView, attribute: .leading, relatedBy: .equal, toItem: self, attribute: .leading, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: frontImageView, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0)
+            ])
         
         // Configure title button
         //
@@ -137,11 +141,11 @@ open class ExpandingMenuItem: UIView {
     // MARK: - Title Button
     fileprivate func createTitleButton(_ title: String, titleColor: UIColor? = nil) -> UIButton {
         let button = UIButton()
-        button.setTitle(title, for: UIControlState())
-        button.setTitleColor(titleColor, for: UIControlState())
+        button.setTitle(title, for: .normal)
+        button.setTitleColor(titleColor, for: .normal)
         button.sizeToFit()
         
-        button.addTarget(self, action: #selector(tapped), for: UIControlEvents.touchUpInside)
+        button.addTarget(self, action: #selector(tapped), for: .touchUpInside)
         
         return button
     }

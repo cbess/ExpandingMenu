@@ -8,8 +8,8 @@
 
 Pod::Spec.new do |s|
   s.name             = "ExpandingMenu"
-  s.version          = "0.3.1"
-  s.summary          = "A mune button expanding vertical."
+  s.version          = "0.4.0"
+  s.summary          = "An expanding menu button."
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -20,12 +20,11 @@ Pod::Spec.new do |s|
                        This library provides a global menu button.
                        DESC
 
-  s.homepage         = "https://github.com/monoqlo/ExpandingMenu"
+  s.homepage         = "https://github.com/cbess/ExpandingMenu"
   # s.screenshots     = "www.example.com/screenshots_1", "www.example.com/screenshots_2"
   s.license          = 'MIT'
-  s.author           = { "monoqlo" => "monoqlo44@gmail.com" }
-  s.source           = { :git => "https://github.com/monoqlo/ExpandingMenu.git", :tag => s.version.to_s }
-  s.social_media_url = 'https://twitter.com/monoqlo'
+  s.authors           = { "monoqlo" => "monoqlo44@gmail.com", 'cbess' => 'cbess@quantumquinn.com' }
+  s.source           = { :git => "https://github.com/cbess/ExpandingMenu.git", :branch => 'master' }
 
   s.platform     = :ios, '8.0'
   s.requires_arc = true
@@ -35,5 +34,5 @@ Pod::Spec.new do |s|
     'ExpandingMenu' => ['ExpandingMenu/Assets/Sounds/*']
   }
 
-  s.frameworks = 'QuartzCore','AudioToolBox'
+  s.frameworks = 'QuartzCore', 'AudioToolBox'
 end

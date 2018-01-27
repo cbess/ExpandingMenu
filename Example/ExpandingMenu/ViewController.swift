@@ -18,25 +18,22 @@ class ViewController: UIViewController {
         configureExpandingMenuButton()
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
-    }
-
     fileprivate func configureExpandingMenuButton() {
         var menuButtonSize: CGSize = CGSize(width: 55, height: 55)
         let menuButton = ExpandingMenuButton(frame: CGRect(origin: CGPoint.zero, size: menuButtonSize), centerImage: #imageLiteral(resourceName: "chooser-button-tab"), centerHighlightedImage: #imageLiteral(resourceName: "chooser-button-tab-highlighted"))
-        menuButton.center = CGPoint(x: self.view.bounds.width - 32.0, y: self.view.bounds.height - 72.0)
+        menuButton.center = CGPoint(x: view.bounds.width - 32.0, y: view.bounds.height - 72.0)
         menuButton.expandingDirection = .left
         menuButton.menuItemMargin = 5
         menuButton.menuAnimationDuration = 0.2
         menuButton.allowSounds = false
-        self.view.addSubview(menuButton)
+        menuButton.enabledExpandingAnimations = [.MenuItemMoving, .MenuItemRotation]
+        menuButton.enabledFoldingAnimations = [.MenuItemMoving, .MenuItemFade]
+        view.addSubview(menuButton)
         
         func showAlert(_ title: String) {
             let alert = UIAlertController(title: title, message: nil, preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-            self.present(alert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
         }
         
         menuButtonSize.width -= 5
@@ -46,23 +43,23 @@ class ViewController: UIViewController {
             showAlert("Music")
         }
         
-        let item2 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-place")) { () -> Void in
+        let item2 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-place")) {
             showAlert("Place")
         }
         
-        let item3 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-camera")) { () -> Void in
+        let item3 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-camera")) {
             showAlert("Camera")
         }
         
-        let item4 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-thought")) { () -> Void in
+        let item4 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-thought")) {
             showAlert("Thought")
         }
         
-        let item5 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-sleep")) { () -> Void in
-            showAlert("Sleep")
-        }
+//        let item5 = ExpandingMenuItem(size: menuButtonSize, image: #imageLiteral(resourceName: "chooser-moment-icon-sleep")) {
+//            showAlert("Sleep")
+//        }
         
-        menuButton.addMenuItems([item1, item2, item3, item4, item5])
+        menuButton.addMenuItems([item1, item2, item3, item4])
         
         menuButton.willPresentMenuItems = { (menu) -> Void in
             print("MenuItems will present.")

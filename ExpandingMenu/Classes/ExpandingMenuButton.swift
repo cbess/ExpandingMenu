@@ -10,17 +10,17 @@ import AudioToolbox
 
 public struct AnimationOptions : OptionSet {
     public let rawValue: Int
-    public init(rawValue: Int) { self.rawValue = rawValue }
     
     public static let MenuItemRotation = AnimationOptions(rawValue: 1)
     public static let MenuItemBound = AnimationOptions(rawValue: 2)
     public static let MenuItemMoving = AnimationOptions(rawValue: 4)
     public static let MenuItemFade = AnimationOptions(rawValue: 8)
-    
     public static let MenuButtonRotation = AnimationOptions(rawValue: 16)
     
     public static let Default: AnimationOptions = [MenuItemRotation, MenuItemBound, MenuItemMoving, MenuButtonRotation]
     public static let All: AnimationOptions = [MenuItemRotation, MenuItemBound, MenuItemMoving, MenuItemFade, MenuButtonRotation]
+    
+    public init(rawValue: Int) { self.rawValue = rawValue }
 }
 
 open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
@@ -74,8 +74,8 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     open var titleTappedActionEnabled: Bool = true
     
-    open var expandingDirection: ExpandingDirection = ExpandingDirection.top
-    open var menuTitleDirection: MenuTitleDirection = MenuTitleDirection.left
+    open var expandingDirection: ExpandingDirection = .top
+    open var menuTitleDirection: MenuTitleDirection = .left
     
     open var enabledExpandingAnimations: AnimationOptions = .Default
     open var enabledFoldingAnimations: AnimationOptions = .Default
@@ -440,7 +440,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         
         insertSubview(bottomView, belowSubview: centerButton)
         
-        // 3. bottom view alpha animation
+        // 3. show bottom view alpha animation
         //
         UIView.animate(withDuration: 0.0618 * menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
             self.bottomView.alpha = self.bottomViewAlpha
@@ -449,9 +449,9 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         // 4. center button rotation animation
         //
         if enabledExpandingAnimations.contains(.MenuButtonRotation) {
-            UIView.animate(withDuration: 0.1575, animations: { () -> Void in
+            UIView.animate(withDuration: 0.1575) {
                 self.centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
-            })
+            }
         } else {
             centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
         }
@@ -475,7 +475,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             
             insertSubview(item, belowSubview: centerButton)
             
-            // 2. Excute expand animation
+            // 2. expand animation
             //
             let distance: CGFloat = makeDistanceFromCenterButton(item.bounds.size, lastDistance: lastDistance, lastItemSize: lastItemSize)
             lastDistance = distance
@@ -513,9 +513,9 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
                 
                 insertSubview(titleButton, belowSubview: centerButton)
                 
-                UIView.animate(withDuration: 0.3, animations: { () -> Void in
+                UIView.animate(withDuration: 0.3) {
                     titleButton.alpha = 1.0
-                })
+                }
             }
         }
         
