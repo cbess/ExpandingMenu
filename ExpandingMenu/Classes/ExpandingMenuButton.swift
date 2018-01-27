@@ -197,7 +197,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             // Remove title button
             //
             if let titleButton = item.titleButton {
-                UIView.animate(withDuration: 0.15, animations: { () -> Void in
+                UIView.animate(withDuration: menuAnimationDuration, animations: { () -> Void in
                     titleButton.alpha = 0.0
                     }, completion: { (finished) -> Void in
                         titleButton.removeFromSuperview()
@@ -208,12 +208,12 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
                 continue
             }
             
-            UIView.animate(withDuration: 0.0618 * 2.0, animations: { () -> Void in
+            UIView.animate(withDuration: menuAnimationDuration, animations: { () -> Void in
                 item.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
             })
         }
         
-        resizeToFoldedFrame { () -> Void in
+        resizeToFoldedFrame {
             self.isAnimating = false
             self.didDismissMenuItems?(self)
         }
@@ -322,14 +322,15 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     fileprivate func resizeToFoldedFrame(completion: (() -> Void)?) {
         if enabledFoldingAnimations.contains(.MenuButtonRotation) {
-            UIView.animate(withDuration: 0.0618 * 3, delay: 0.0618 * 2, options: .curveEaseIn, animations: { () -> Void in
+            UIView.animate(withDuration: menuAnimationDuration, delay: menuAnimationDuration * 0.5, options: .curveEaseIn, animations: { () -> Void in
                 self.centerButton.transform = CGAffineTransform(rotationAngle: 0.0)
                 }, completion: nil)
         } else {
             centerButton.transform = CGAffineTransform(rotationAngle: 0.0)
         }
         
-        UIView.animate(withDuration: 0.15, delay: 0.35, options: .curveLinear, animations: { () -> Void in
+        // hide bottom view
+        UIView.animate(withDuration: menuAnimationDuration, delay: menuAnimationDuration * 0.5, options: .curveLinear, animations: { () -> Void in
             self.bottomView.alpha = 0.0
             }, completion: { _ in
                 // Remove the items from the superview
@@ -352,7 +353,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     fileprivate func makeFoldAnimation(startingPoint: CGPoint, backwardPoint: CGPoint, endPoint: CGPoint) -> CAAnimationGroup {
-        let animationDuration = menuAnimationDuration
+        let animationDuration = menuAnimationDuration * 0.9 // make it close a bit faster, than opening
         let animationGroup: CAAnimationGroup = CAAnimationGroup()
         animationGroup.animations = []
         animationGroup.duration = animationDuration
@@ -442,14 +443,14 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         
         // 3. show bottom view alpha animation
         //
-        UIView.animate(withDuration: 0.0618 * menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
+        UIView.animate(withDuration: menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
             self.bottomView.alpha = self.bottomViewAlpha
             }, completion: nil)
         
         // 4. center button rotation animation
         //
         if enabledExpandingAnimations.contains(.MenuButtonRotation) {
-            UIView.animate(withDuration: 0.1575) {
+            UIView.animate(withDuration: menuAnimationDuration * 0.5) {
                 self.centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
             }
         } else {
@@ -528,7 +529,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     fileprivate func makeExpandingAnimation(startingPoint: CGPoint, farPoint: CGPoint, nearPoint: CGPoint, endPoint: CGPoint) -> CAAnimationGroup {
-        let animationDuration = menuAnimationDuration - 0.5 // 0.3
+        let animationDuration = menuAnimationDuration
         let animationGroup: CAAnimationGroup = CAAnimationGroup()
         animationGroup.animations = []
         animationGroup.duration = animationDuration
