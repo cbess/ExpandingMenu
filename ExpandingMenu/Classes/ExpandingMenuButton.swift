@@ -108,13 +108,13 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     // MARK: - Initializer
     
-    public init(frame: CGRect, centerImage: UIImage, centerHighlightedImage: UIImage) {
+    public init(frame: CGRect, centerImage: UIImage, centerHighlightedImage: UIImage? = nil) {
         super.init(frame: frame)
         
         func configureViewsLayoutWithButtonSize(_ centerButtonSize: CGSize) {
             // Configure menu button frame
             foldedSize = centerButtonSize
-            self.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: foldedSize.width, height: foldedSize.height);
+            self.frame = CGRect(origin: frame.origin, size: foldedSize)
             
             // Configure center button
             centerButton = UIButton(frame: CGRect(x: 0.0, y: 0.0, width: centerButtonSize.width, height: centerButtonSize.height))
@@ -152,7 +152,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         configureSounds()
     }
     
-    public convenience init(centerImage: UIImage, centerHighlightedImage: UIImage) {
+    public convenience init(centerImage: UIImage, centerHighlightedImage: UIImage? = nil) {
         self.init(frame: CGRect.zero, centerImage: centerImage, centerHighlightedImage: centerHighlightedImage)
     }
     
@@ -570,7 +570,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     // MARK: - Touch Event
     
     override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        // Tap the bottom area, excute the fold animation
+        // Tap the bottom area, exec the fold animation
         foldMenuItems()
     }
     
