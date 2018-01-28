@@ -54,16 +54,13 @@ open class ExpandingMenuItem: UIView {
     fileprivate var frontImageView: UIImageView
     fileprivate var tappedAction: (() -> Void)?
     
-    // MARK: - Initializer
     public init(size: CGSize?, title: String? = nil, titleColor: UIColor? = nil, image: UIImage, highlightedImage: UIImage?, backgroundImage: UIImage?, backgroundHighlightedImage: UIImage?, itemTapped: (() -> Void)?) {
         
         // Initialize properties
-        //
         frontImageView = UIImageView(image: image, highlightedImage: highlightedImage)
         tappedAction = itemTapped
         
         // Configure frame
-        //
         var itemFrame: CGRect = .zero
         if let itemSize = size, itemSize != CGSize.zero {
             itemFrame.size = itemSize
@@ -78,7 +75,6 @@ open class ExpandingMenuItem: UIView {
         super.init(frame: itemFrame)
         
         // Configure base button
-        //
         let baseButton = UIButton()
         if let backgroundImage = backgroundImage {
             baseButton.setImage(backgroundImage, for: .normal)
@@ -99,7 +95,6 @@ open class ExpandingMenuItem: UIView {
             ])
         
         // Configure front images
-        //
         frontImageView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(frontImageView)
         
@@ -111,7 +106,6 @@ open class ExpandingMenuItem: UIView {
             ])
         
         // Configure title button
-        //
         if let title = title {
             titleButton = createTitleButton(title, titleColor: titleColor)
         }
@@ -136,6 +130,7 @@ open class ExpandingMenuItem: UIView {
     }
     
     // MARK: - Title Button
+    
     fileprivate func createTitleButton(_ title: String, titleColor: UIColor? = nil) -> UIButton {
         let button = UIButton()
         button.setTitle(title, for: .normal)
@@ -147,6 +142,7 @@ open class ExpandingMenuItem: UIView {
     }
     
     // MARK: - Tapped Action
+    
     func tapped() {
         delegate?.menuItemTapped(self)
         tappedAction?()

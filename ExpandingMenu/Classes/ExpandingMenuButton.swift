@@ -349,7 +349,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         animationGroup.animations = []
         animationGroup.duration = animationDuration
         
-        // 1.Configure rotation animation
+        // Configure rotation animation
         if enabledFoldingAnimations.contains(.menuItemRotation) {
             let rotationAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, Double.pi, Double.pi * 2.0]
@@ -359,7 +359,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             animationGroup.animations?.append(rotationAnimation)
         }
         
-        // 2.Configure moving animation
+        // Configure moving animation
         let movingAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "position")
         
         // Create moving path
@@ -392,7 +392,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         
         animationGroup.animations?.append(movingAnimation)
         
-        // 3.Configure fade animation
+        // Configure fade animation
         if enabledFoldingAnimations.contains(.menuItemFade) {
             let fadeAnimation = CAKeyframeAnimation(keyPath: "opacity")
             fadeAnimation.values = [1.0, 0.0]
@@ -415,23 +415,23 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // Configure center button expanding
-        // 1. Copy the current center point and backup default center point
+        // Copy the current center point and backup default center point
         centerButton.center = center
         defaultCenterPoint = center
         
-        // 2. Resize the frame
+        // Resize the frame
         frame = CGRect(x: 0.0, y: 0.0, width: expandingSize.width, height: expandingSize.height)
         center = CGPoint(x: expandingSize.width / 2.0, y: expandingSize.height / 2.0)
         bottomView.frame = frame
         
         insertSubview(bottomView, belowSubview: centerButton)
         
-        // 3. show bottom view alpha animation
+        // show bottom view alpha animation
         UIView.animate(withDuration: menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
             self.bottomView.effect = UIBlurEffect(style: self.bottomViewBlurEffectStyle)
             }, completion: nil)
         
-        // 4. center button rotation animation
+        // center button rotation animation
         if enabledExpandingAnimations.contains(.menuButtonRotation) {
             UIView.animate(withDuration: menuAnimationDuration * 0.5) {
                 self.centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
@@ -440,7 +440,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
         }
         
-        // 5. expanding animation
+        // expanding animation
         let currentAngle: CGFloat = 90.0
         
         var lastDistance: CGFloat = 0.0
@@ -452,12 +452,12 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             item.transform = CGAffineTransform(translationX: 1.0, y: 1.0)
             item.alpha = 1.0
             
-            // 1. Add item to the view
+            // Add item to the view
             item.center = centerButton.center
             
             insertSubview(item, belowSubview: centerButton)
             
-            // 2. expand animation
+            // expand animation
             let distance: CGFloat = makeDistanceFromCenterButton(item.bounds.size, lastDistance: lastDistance, lastItemSize: lastItemSize)
             lastDistance = distance
             lastItemSize = item.bounds.size
@@ -470,7 +470,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             item.layer.add(expandingAnimation, forKey: "expandingAnimation")
             item.center = endPoint
             
-            // 3. Add Title Button
+            // Add Title Button
             item.titleTappedActionEnabled = titleTappedActionEnabled
             
             if let titleButton = item.titleButton {
@@ -512,7 +512,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         animationGroup.animations = []
         animationGroup.duration = animationDuration
         
-        // 1.Configure rotation animation
+        // Configure rotation animation
         if enabledExpandingAnimations.contains(.menuItemRotation) {
             let rotationAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, -Double.pi, -Double.pi * 1.5, -Double.pi  * 2.0]
@@ -522,7 +522,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             animationGroup.animations?.append(rotationAnimation)
         }
         
-        // 2.Configure moving animation
+        // Configure moving animation
         let movingAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "position")
         
         // Create moving path
@@ -556,7 +556,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         
         animationGroup.animations?.append(movingAnimation)
         
-        // 3.Configure fade animation
+        // Configure fade animation
         if enabledExpandingAnimations.contains(.menuItemFade) {
             let fadeAnimation = CAKeyframeAnimation(keyPath: "opacity")
             fadeAnimation.values = [0.0, 1.0]
