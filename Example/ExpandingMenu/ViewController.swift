@@ -21,7 +21,7 @@ class ViewController: UIViewController {
 
     fileprivate func configureExpandingMenuButton() {
         var menuButtonSize: CGSize = CGSize(width: 45, height: 45)
-        let menuButton = ExpandingMenuButton(frame: CGRect(origin: CGPoint(x: contentView.bounds.width - menuButtonSize.width - 5, y: 5), size: menuButtonSize), centerImage: #imageLiteral(resourceName: "chooser-button-tab"), centerHighlightedImage: #imageLiteral(resourceName: "chooser-button-tab-highlighted"))
+        let menuButton = ExpandingMenuButton(frame: CGRect(origin: CGPoint(x: contentView.bounds.width - menuButtonSize.width * 2, y: 5), size: menuButtonSize), centerImage: #imageLiteral(resourceName: "chooser-button-tab"), centerHighlightedImage: #imageLiteral(resourceName: "chooser-button-tab-highlighted"))
         menuButton.expandingDirection = .left
         menuButton.menuItemMargin = 5
         menuButton.menuAnimationDuration = 0.2

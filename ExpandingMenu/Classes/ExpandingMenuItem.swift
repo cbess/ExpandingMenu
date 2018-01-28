@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(iOS 10.0, *)
 open class ExpandingMenuItem: UIView {
     
     open var title: String? {
@@ -17,7 +18,7 @@ open class ExpandingMenuItem: UIView {
         set {
             if let title = newValue {
                 if let titleButton = titleButton {
-                    titleButton.setTitle(title, for: UIControlState())
+                    titleButton.setTitle(title, for: .normal)
                 } else {
                     titleButton = createTitleButton(title, titleColor: titleColor)
                 }
@@ -33,11 +34,11 @@ open class ExpandingMenuItem: UIView {
     
     open var titleColor: UIColor? {
         get {
-            return titleButton?.titleColor(for: UIControlState())
+            return titleButton?.titleColor(for: .normal)
         }
         
         set {
-            titleButton?.setTitleColor(newValue, for: UIControlState())
+            titleButton?.setTitleColor(newValue, for: .normal)
         }
     }
     
@@ -87,6 +88,7 @@ open class ExpandingMenuItem: UIView {
         }
         
         baseButton.translatesAutoresizingMaskIntoConstraints = false
+        baseButton.addTarget(self, action: #selector(tapped), for: .touchUpInside)
         addSubview(baseButton)
         
         addConstraints([
@@ -96,13 +98,8 @@ open class ExpandingMenuItem: UIView {
             NSLayoutConstraint(item: baseButton, attribute: .trailing, relatedBy: .equal, toItem: self, attribute: .trailing, multiplier: 1, constant: 0)
             ])
         
-        // Add an action for the item
-        //
-        baseButton.addTarget(self, action: #selector(tapped), for: UIControlEvents.touchUpInside)
-        
         // Configure front images
         //
-        //frontImageView.contentMode = .center
         frontImageView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(frontImageView)
         
@@ -144,7 +141,6 @@ open class ExpandingMenuItem: UIView {
         button.setTitle(title, for: .normal)
         button.setTitleColor(titleColor, for: .normal)
         button.sizeToFit()
-        
         button.addTarget(self, action: #selector(tapped), for: .touchUpInside)
         
         return button

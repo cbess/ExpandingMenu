@@ -23,6 +23,7 @@ public struct AnimationOptions : OptionSet {
     public init(rawValue: Int) { self.rawValue = rawValue }
 }
 
+@available(iOS 10.0, *)
 open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     public enum ExpandingDirection {
@@ -64,13 +65,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    open var bottomViewColor: UIColor = UIColor.black {
-        didSet {
-            bottomView.backgroundColor = bottomViewColor
-        }
-    }
-    
-    open var bottomViewAlpha: CGFloat = 0.618
+    open var bottomViewBlurEffectStyle: UIBlurEffectStyle = .regular
     
     open var titleTappedActionEnabled: Bool = true
     
@@ -99,7 +94,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     fileprivate var foldedSize: CGSize = CGSize.zero
     
-    fileprivate var bottomView: UIView = UIView()
+    fileprivate var bottomView = UIVisualEffectView()
     fileprivate var centerButton: UIButton = UIButton()
     fileprivate var menuItems: [ExpandingMenuItem] = []
     
@@ -135,9 +130,8 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             
             // Configure bottom view
             //
-            bottomView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: expandingSize.width, height: expandingSize.height))
-            bottomView.backgroundColor = bottomViewColor
-            bottomView.alpha = 0.0
+            bottomView.frame = CGRect(x: 0.0, y: 0.0, width: expandingSize.width, height: expandingSize.height)
+            bottomView.effect = UIBlurEffect(style: bottomViewBlurEffectStyle)
             
             // Make bottomView's touch can delay superView witch like UIScrollView scrolling
             //
@@ -333,7 +327,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         
         // hide bottom view
         UIView.animate(withDuration: menuAnimationDuration, delay: menuAnimationDuration * 0.5, options: .curveLinear, animations: { () -> Void in
-            self.bottomView.alpha = 0.0
+            self.bottomView.effect = nil
             }, completion: { _ in
                 // Remove the items from the superview
                 //
@@ -447,7 +441,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         // 3. show bottom view alpha animation
         //
         UIView.animate(withDuration: menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
-            self.bottomView.alpha = self.bottomViewAlpha
+            self.bottomView.effect = UIBlurEffect(style: self.bottomViewBlurEffectStyle)
             }, completion: nil)
         
         // 4. center button rotation animation
