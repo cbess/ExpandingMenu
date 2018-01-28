@@ -26,8 +26,8 @@ class ViewController: UIViewController {
         menuButton.menuItemMargin = 5
         menuButton.menuAnimationDuration = 0.2
         menuButton.allowSounds = false
-        menuButton.enabledExpandingAnimations = [.MenuItemMoving, .MenuItemRotation]
-        menuButton.enabledFoldingAnimations = [.MenuItemMoving, .MenuItemFade]
+        menuButton.enabledExpandingAnimations = [.menuItemMoving, .menuItemRotation]
+        menuButton.enabledFoldingAnimations = [.menuItemMoving, .menuItemFade]
         contentView.addSubview(menuButton)
         
         func showAlert(_ title: String) {

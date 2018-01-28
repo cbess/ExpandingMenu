@@ -8,17 +8,17 @@
 import UIKit
 import AudioToolbox
 
-public struct AnimationOptions : OptionSet {
+public struct AnimationOptions: OptionSet {
     public let rawValue: Int
     
-    public static let MenuItemRotation = AnimationOptions(rawValue: 1)
-    public static let MenuItemBound = AnimationOptions(rawValue: 2)
-    public static let MenuItemMoving = AnimationOptions(rawValue: 4)
-    public static let MenuItemFade = AnimationOptions(rawValue: 8)
-    public static let MenuButtonRotation = AnimationOptions(rawValue: 16)
+    public static let menuItemRotation = AnimationOptions(rawValue: 1)
+    public static let menuItemBound = AnimationOptions(rawValue: 2)
+    public static let menuItemMoving = AnimationOptions(rawValue: 4)
+    public static let menuItemFade = AnimationOptions(rawValue: 8)
+    public static let menuButtonRotation = AnimationOptions(rawValue: 16)
     
-    public static let Default: AnimationOptions = [MenuItemRotation, MenuItemBound, MenuItemMoving, MenuButtonRotation]
-    public static let All: AnimationOptions = [MenuItemRotation, MenuItemBound, MenuItemMoving, MenuItemFade, MenuButtonRotation]
+    public static let normal: AnimationOptions = [menuItemRotation, menuItemBound, menuItemMoving, menuButtonRotation]
+    public static let all: AnimationOptions = [menuItemRotation, menuItemBound, menuItemMoving, menuItemFade, menuButtonRotation]
     
     public init(rawValue: Int) { self.rawValue = rawValue }
 }
@@ -39,7 +39,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     // MARK: Public Properties
     open var menuAnimationDuration: CFTimeInterval = 0.35
-    open var menuItemMargin: CGFloat = 16.0
+    open var menuItemMargin: CGFloat = 16
     
     open var allowSounds: Bool = true {
         didSet {
@@ -72,8 +72,8 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     open var expandingDirection: ExpandingDirection = .top
     open var menuTitleDirection: MenuTitleDirection = .left
     
-    open var enabledExpandingAnimations: AnimationOptions = .Default
-    open var enabledFoldingAnimations: AnimationOptions = .Default
+    open var enabledExpandingAnimations: AnimationOptions = .normal
+    open var enabledFoldingAnimations: AnimationOptions = .normal
     
     open var willPresentMenuItems: ((ExpandingMenuButton) -> Void)?
     open var didPresentMenuItems: ((ExpandingMenuButton) -> Void)?
@@ -107,17 +107,16 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     
     // MARK: - Initializer
+    
     public init(frame: CGRect, centerImage: UIImage, centerHighlightedImage: UIImage) {
         super.init(frame: frame)
         
         func configureViewsLayoutWithButtonSize(_ centerButtonSize: CGSize) {
             // Configure menu button frame
-            //
             foldedSize = centerButtonSize
             self.frame = CGRect(x: frame.origin.x, y: frame.origin.y, width: foldedSize.width, height: foldedSize.height);
             
-            // Congifure center button
-            //
+            // Configure center button
             centerButton = UIButton(frame: CGRect(x: 0.0, y: 0.0, width: centerButtonSize.width, height: centerButtonSize.height))
             centerButton.setImage(centerImage, for: .normal)
             centerButton.setImage(centerHighlightedImage, for: .highlighted)
@@ -129,12 +128,10 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             addSubview(centerButton)
             
             // Configure bottom view
-            //
             bottomView.frame = CGRect(x: 0.0, y: 0.0, width: expandingSize.width, height: expandingSize.height)
             bottomView.effect = UIBlurEffect(style: bottomViewBlurEffectStyle)
             
             // Make bottomView's touch can delay superView witch like UIScrollView scrolling
-            //
             bottomView.isUserInteractionEnabled = true;
             let tapGesture = UIGestureRecognizer()
             tapGesture.delegate = self
@@ -142,7 +139,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // Configure enter and highlighted center image
-        //
         self.centerImage = centerImage
         self.centerHighlightedImage = centerHighlightedImage
         
@@ -165,11 +161,17 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     // MARK: - Configure Menu Items
+    
     open func addMenuItems(_ menuItems: [ExpandingMenuItem]) {
         self.menuItems += menuItems
     }
     
+    open func addMenuItem(_ menuItem: ExpandingMenuItem) {
+        menuItems.append(menuItem)
+    }
+    
     // MARK: - Menu Item Tapped Action
+    
     open func menuItemTapped(_ item: ExpandingMenuItem) {
         willDismissMenuItems?(self)
         isAnimating = true
@@ -180,18 +182,15 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             AudioServicesPlaySystemSound(selectedSound)
         }
         
-        // Excute the explode animation when the item is seleted
-        //
-        UIView.animate(withDuration: 0.0618 * 5.0, animations: { () -> Void in
+        // explode animation when the item is selected
+        UIView.animate(withDuration: 0.0618 * 5.0) {
             item.transform = CGAffineTransform(scaleX: 3.0, y: 3.0)
             item.alpha = 0.0
-        })
+        }
         
-        // Excute the dismiss animation when the item is unselected
-        //
+        // dismiss animation when the item is unselected
         for (index, item) in menuItems.enumerated() {
             // Remove title button
-            //
             if let titleButton = item.titleButton {
                 UIView.animate(withDuration: menuAnimationDuration, animations: { () -> Void in
                     titleButton.alpha = 0.0
@@ -204,9 +203,9 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
                 continue
             }
             
-            UIView.animate(withDuration: menuAnimationDuration, animations: { () -> Void in
+            UIView.animate(withDuration: menuAnimationDuration) {
                 item.transform = CGAffineTransform(scaleX: 0.0, y: 0.0)
-            })
+            }
         }
         
         resizeToFoldedFrame {
@@ -215,7 +214,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    // MARK: - Center Button Action
     @objc fileprivate func centerButtonTapped() {
         if !isAnimating {
             if isExpanding {
@@ -226,7 +224,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    // MARK: - Configure Sounds
     fileprivate func configureSounds() {
         if allowSounds {
             let expandingSoundUrl = URL(fileURLWithPath: expandingSoundPath)
@@ -244,12 +241,12 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    // MARK: - Calculate The Distance From Center Button
+    /// Calculate The Distance From Center Button
     fileprivate func makeDistanceFromCenterButton(_ itemSize: CGSize, lastDistance: CGFloat, lastItemSize: CGSize) -> CGFloat {
         return lastDistance + itemSize.height / 2.0 + menuItemMargin + lastItemSize.height / 2.0
     }
     
-    // MARK: - Caculate The Item's End Point
+    /// Calculate The Item's End Point
     fileprivate func makeEndPoint(_ itemExpandRadius: CGFloat, angle: CGFloat) -> CGPoint {
         switch expandingDirection {
         case .top:
@@ -271,6 +268,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     // MARK: - Fold Menu Items
+    
     fileprivate func foldMenuItems() {
         willDismissMenuItems?(self)
         isAnimating = true
@@ -296,7 +294,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             item.center = centerButton.center
             
             // Remove title button
-            //
             if let titleButton = item.titleButton {
                 UIView.animate(withDuration: 0.15, animations: { () -> Void in
                     titleButton.alpha = 0.0
@@ -309,7 +306,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         bringSubview(toFront: centerButton)
         
         // Resize the ExpandingMenuButton's frame to the foled frame and remove the item buttons
-        //
         resizeToFoldedFrame {
             self.isAnimating = false
             self.didDismissMenuItems?(self)
@@ -317,7 +313,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     fileprivate func resizeToFoldedFrame(completion: (() -> Void)?) {
-        if enabledFoldingAnimations.contains(.MenuButtonRotation) {
+        if enabledFoldingAnimations.contains(.menuButtonRotation) {
             UIView.animate(withDuration: menuAnimationDuration, delay: menuAnimationDuration * 0.5, options: .curveEaseIn, animations: { () -> Void in
                 self.centerButton.transform = CGAffineTransform(rotationAngle: 0.0)
                 }, completion: nil)
@@ -330,7 +326,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             self.bottomView.effect = nil
             }, completion: { _ in
                 // Remove the items from the superview
-                //
                 for item in self.menuItems {
                     item.removeFromSuperview()
                 }
@@ -355,8 +350,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         animationGroup.duration = animationDuration
         
         // 1.Configure rotation animation
-        //
-        if enabledFoldingAnimations.contains(.MenuItemRotation) {
+        if enabledFoldingAnimations.contains(.menuItemRotation) {
             let rotationAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, Double.pi, Double.pi * 2.0]
             rotationAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
@@ -366,31 +360,29 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // 2.Configure moving animation
-        //
         let movingAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "position")
         
         // Create moving path
-        //
         let path: CGMutablePath = CGMutablePath()
         
-        if enabledFoldingAnimations.contains([.MenuItemMoving, .MenuItemBound]) {
+        if enabledFoldingAnimations.contains([.menuItemMoving, .menuItemBound]) {
             path.move(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
             path.addLine(to: CGPoint(x: backwardPoint.x, y: backwardPoint.y))
             path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
             
             movingAnimation.keyTimes = [0.0, 0.75, 1.0]
-        } else if enabledFoldingAnimations.contains(.MenuItemMoving) {
+        } else if enabledFoldingAnimations.contains(.menuItemMoving) {
             path.move(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
             path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
             
             movingAnimation.keyTimes = [0.0, 0.75, 1.0]
-        } else if enabledFoldingAnimations.contains(.MenuItemBound) {
+        } else if enabledFoldingAnimations.contains(.menuItemBound) {
             path.move(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
             path.addLine(to: CGPoint(x: backwardPoint.x, y: backwardPoint.y))
             path.addLine(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
             
             movingAnimation.keyTimes = [0.0, 0.3, 0.5, 1.0]
-        } else if enabledFoldingAnimations.contains(.MenuItemFade) {
+        } else if enabledFoldingAnimations.contains(.menuItemFade) {
             path.move(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
             path.addLine(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
         }
@@ -401,8 +393,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         animationGroup.animations?.append(movingAnimation)
         
         // 3.Configure fade animation
-        //
-        if enabledFoldingAnimations.contains(.MenuItemFade) {
+        if enabledFoldingAnimations.contains(.menuItemFade) {
             let fadeAnimation = CAKeyframeAnimation(keyPath: "opacity")
             fadeAnimation.values = [1.0, 0.0]
             fadeAnimation.keyTimes = [0.0, 0.75, 1.0]
@@ -413,8 +404,8 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         return animationGroup
     }
     
-    
     // MARK: - Expand Menu Items
+    
     fileprivate func expandMenuItems() {
         willPresentMenuItems?(self)
         isAnimating = false
@@ -424,14 +415,11 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // Configure center button expanding
-        //
         // 1. Copy the current center point and backup default center point
-        //
         centerButton.center = center
         defaultCenterPoint = center
         
         // 2. Resize the frame
-        //
         frame = CGRect(x: 0.0, y: 0.0, width: expandingSize.width, height: expandingSize.height)
         center = CGPoint(x: expandingSize.width / 2.0, y: expandingSize.height / 2.0)
         bottomView.frame = frame
@@ -439,14 +427,12 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         insertSubview(bottomView, belowSubview: centerButton)
         
         // 3. show bottom view alpha animation
-        //
         UIView.animate(withDuration: menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
             self.bottomView.effect = UIBlurEffect(style: self.bottomViewBlurEffectStyle)
             }, completion: nil)
         
         // 4. center button rotation animation
-        //
-        if enabledExpandingAnimations.contains(.MenuButtonRotation) {
+        if enabledExpandingAnimations.contains(.menuButtonRotation) {
             UIView.animate(withDuration: menuAnimationDuration * 0.5) {
                 self.centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
             }
@@ -455,7 +441,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // 5. expanding animation
-        //
         let currentAngle: CGFloat = 90.0
         
         var lastDistance: CGFloat = 0.0
@@ -468,13 +453,11 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             item.alpha = 1.0
             
             // 1. Add item to the view
-            //
             item.center = centerButton.center
             
             insertSubview(item, belowSubview: centerButton)
             
             // 2. expand animation
-            //
             let distance: CGFloat = makeDistanceFromCenterButton(item.bounds.size, lastDistance: lastDistance, lastItemSize: lastItemSize)
             lastDistance = distance
             lastItemSize = item.bounds.size
@@ -488,7 +471,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             item.center = endPoint
             
             // 3. Add Title Button
-            //
             item.titleTappedActionEnabled = titleTappedActionEnabled
             
             if let titleButton = item.titleButton {
@@ -518,7 +500,6 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // Configure the expanding status
-        //
         isExpanding = true
         isAnimating = false
         
@@ -532,8 +513,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         animationGroup.duration = animationDuration
         
         // 1.Configure rotation animation
-        //
-        if enabledExpandingAnimations.contains(.MenuItemRotation) {
+        if enabledExpandingAnimations.contains(.menuItemRotation) {
             let rotationAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, -Double.pi, -Double.pi * 1.5, -Double.pi  * 2.0]
             rotationAnimation.duration = animationDuration
@@ -543,32 +523,30 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // 2.Configure moving animation
-        //
         let movingAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "position")
         
         // Create moving path
-        //
         let path: CGMutablePath = CGMutablePath()
         
-        if enabledExpandingAnimations.contains([.MenuItemMoving, .MenuItemBound]) {
+        if enabledExpandingAnimations.contains([.menuItemMoving, .menuItemBound]) {
             path.move(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
             path.addLine(to: CGPoint(x: farPoint.x, y: farPoint.y))
             path.addLine(to: CGPoint(x: nearPoint.x, y: nearPoint.y))
             path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
             
             movingAnimation.keyTimes = [0.0, 0.5, 0.7, 1.0]
-        } else if enabledExpandingAnimations.contains(.MenuItemMoving) {
+        } else if enabledExpandingAnimations.contains(.menuItemMoving) {
             path.move(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
             path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
             
             movingAnimation.keyTimes = [0.0, 0.5, 1.0]
-        } else if enabledExpandingAnimations.contains(.MenuItemBound) {
+        } else if enabledExpandingAnimations.contains(.menuItemBound) {
             path.move(to: CGPoint(x: farPoint.x, y: farPoint.y))
             path.addLine(to: CGPoint(x: nearPoint.x, y: nearPoint.y))
             path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
             
             movingAnimation.keyTimes = [0.0, 0.3, 0.5, 1.0]
-        } else if enabledExpandingAnimations.contains(.MenuItemFade) {
+        } else if enabledExpandingAnimations.contains(.menuItemFade) {
             path.move(to: CGPoint(x: endPoint.x, y: endPoint.y))
             path.addLine(to: CGPoint(x: endPoint.x, y: endPoint.y))
         }
@@ -579,8 +557,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         animationGroup.animations?.append(movingAnimation)
         
         // 3.Configure fade animation
-        //
-        if enabledExpandingAnimations.contains(.MenuItemFade) {
+        if enabledExpandingAnimations.contains(.menuItemFade) {
             let fadeAnimation = CAKeyframeAnimation(keyPath: "opacity")
             fadeAnimation.values = [0.0, 1.0]
             fadeAnimation.duration = animationDuration
@@ -591,12 +568,14 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     }
     
     // MARK: - Touch Event
+    
     override open func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         // Tap the bottom area, excute the fold animation
         foldMenuItems()
     }
     
     // MARK: - UIGestureRecognizer Delegate
+    
     override open func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
     }
