@@ -94,7 +94,9 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     fileprivate var centerImage: UIImage?
     fileprivate var centerHighlightedImage: UIImage?
     
-    fileprivate var expandingSize: CGSize = UIScreen.main.bounds.size
+    fileprivate var expandingSize: CGSize {
+        return superview?.bounds.size ?? UIScreen.main.bounds.size
+    }
     fileprivate var foldedSize: CGSize = CGSize.zero
     
     fileprivate var bottomView: UIView = UIView()
@@ -438,6 +440,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         //
         frame = CGRect(x: 0.0, y: 0.0, width: expandingSize.width, height: expandingSize.height)
         center = CGPoint(x: expandingSize.width / 2.0, y: expandingSize.height / 2.0)
+        bottomView.frame = frame
         
         insertSubview(bottomView, belowSubview: centerButton)
         

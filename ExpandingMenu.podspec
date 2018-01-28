@@ -26,7 +26,7 @@ Pod::Spec.new do |s|
   s.authors           = { "monoqlo" => "monoqlo44@gmail.com", 'cbess' => 'cbess@quantumquinn.com' }
   s.source           = { :git => "https://github.com/cbess/ExpandingMenu.git", :branch => 'master' }
 
-  s.platform     = :ios, '8.0'
+  s.platform     = :ios, '10.0'
   s.requires_arc = true
 
   s.source_files = 'ExpandingMenu/Classes/*.swift'

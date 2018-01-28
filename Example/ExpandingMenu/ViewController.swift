@@ -10,7 +10,8 @@ import UIKit
 import ExpandingMenu
 
 class ViewController: UIViewController {
-
+    @IBOutlet weak var contentView: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -19,16 +20,15 @@ class ViewController: UIViewController {
     }
 
     fileprivate func configureExpandingMenuButton() {
-        var menuButtonSize: CGSize = CGSize(width: 55, height: 55)
-        let menuButton = ExpandingMenuButton(frame: CGRect(origin: CGPoint.zero, size: menuButtonSize), centerImage: #imageLiteral(resourceName: "chooser-button-tab"), centerHighlightedImage: #imageLiteral(resourceName: "chooser-button-tab-highlighted"))
-        menuButton.center = CGPoint(x: view.bounds.width - 32.0, y: view.bounds.height - 72.0)
+        var menuButtonSize: CGSize = CGSize(width: 45, height: 45)
+        let menuButton = ExpandingMenuButton(frame: CGRect(origin: CGPoint(x: contentView.bounds.width - menuButtonSize.width - 5, y: 5), size: menuButtonSize), centerImage: #imageLiteral(resourceName: "chooser-button-tab"), centerHighlightedImage: #imageLiteral(resourceName: "chooser-button-tab-highlighted"))
         menuButton.expandingDirection = .left
         menuButton.menuItemMargin = 5
         menuButton.menuAnimationDuration = 0.2
         menuButton.allowSounds = false
         menuButton.enabledExpandingAnimations = [.MenuItemMoving, .MenuItemRotation]
         menuButton.enabledFoldingAnimations = [.MenuItemMoving, .MenuItemFade]
-        view.addSubview(menuButton)
+        contentView.addSubview(menuButton)
         
         func showAlert(_ title: String) {
             let alert = UIAlertController(title: title, message: nil, preferredStyle: .alert)
