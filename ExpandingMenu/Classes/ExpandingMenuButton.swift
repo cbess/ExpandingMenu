@@ -439,7 +439,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         
         // center button rotation animation
         if enabledExpandingAnimations.contains(.menuButtonRotation) {
-            UIView.animate(withDuration: menuAnimationDuration * 0.5) {
+            UIView.animate(withDuration: menuAnimationDuration) {
                 self.centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
             }
         } else {

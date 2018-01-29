@@ -153,12 +153,18 @@ open class ExpandingMenuItem: UIView {
         button.setTitle(title, for: .normal)
         button.setTitleColor(titleColor, for: .normal)
         button.sizeToFit()
-        button.addTarget(self, action: #selector(tapped), for: .touchUpInside)
+        button.addTarget(self, action: #selector(titleTapped), for: .touchUpInside)
         
         return button
     }
     
     // MARK: - Tapped Action
+    
+    func titleTapped() {
+        if titleTappedActionEnabled {
+            tapped()
+        }
+    }
     
     func tapped() {
         delegate?.menuItemTapped(self)
