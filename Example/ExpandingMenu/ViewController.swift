@@ -14,14 +14,14 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
         
         configureExpandingMenuButton()
     }
 
     fileprivate func configureExpandingMenuButton() {
         var menuButtonSize: CGSize = CGSize(width: 45, height: 45)
-        let menuButton = ExpandingMenuButton(frame: CGRect(origin: CGPoint(x: contentView.bounds.width - menuButtonSize.width * 2, y: 5), size: menuButtonSize), centerImage: #imageLiteral(resourceName: "chooser-button-tab"), centerHighlightedImage: #imageLiteral(resourceName: "chooser-button-tab-highlighted"))
+        let menuButton = ExpandingMenuButton(frame: CGRect(origin: .zero, size: menuButtonSize), centerImage: #imageLiteral(resourceName: "chooser-button-tab"))
+        menuButton.translatesAutoresizingMaskIntoConstraints = false
         menuButton.expandingDirection = .left
         menuButton.menuItemMargin = 5
         menuButton.menuAnimationDuration = 0.2
@@ -29,6 +29,12 @@ class ViewController: UIViewController {
         menuButton.enabledExpandingAnimations = [.menuItemMoving, .menuItemRotation]
         menuButton.enabledFoldingAnimations = [.menuItemMoving, .menuItemFade]
         contentView.addSubview(menuButton)
+        
+        // add layout constraints
+        menuButton.widthAnchor.constraint(equalToConstant: menuButtonSize.width).isActive = true
+        menuButton.heightAnchor.constraint(equalToConstant: menuButtonSize.height).isActive = true
+        menuButton.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
+        menuButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
         
         func showAlert(_ title: String) {
             let alert = UIAlertController(title: title, message: nil, preferredStyle: .alert)
