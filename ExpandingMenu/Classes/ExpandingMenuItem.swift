@@ -50,13 +50,30 @@ open class ExpandingMenuItem: UIView {
     
     var index: Int = 0
     weak var delegate: ExpandingMenuButton?
+    /// The image shown for the menu item
+    public var image: UIImage? {
+        get {
+            return frontImageView.image
+        }
+        set {
+            frontImageView.image = newValue
+        }
+    }
+    /// The highligthed image shown for the menu item
+    public var highlightedImage: UIImage? {
+        get {
+            return frontImageView.highlightedImage
+        }
+        set {
+            frontImageView.highlightedImage = newValue
+        }
+    }
     fileprivate(set) var titleButton:UIButton?
     fileprivate var frontImageView: UIImageView
     fileprivate var tappedAction: (() -> Void)?
     
     public init(size: CGSize?, title: String? = nil, titleColor: UIColor? = nil, image: UIImage, highlightedImage: UIImage?, backgroundImage: UIImage?, backgroundHighlightedImage: UIImage?, itemTapped: (() -> Void)?) {
         
-        // Initialize properties
         frontImageView = UIImageView(image: image, highlightedImage: highlightedImage)
         tappedAction = itemTapped
         
