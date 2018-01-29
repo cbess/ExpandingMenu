@@ -607,16 +607,16 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     // MARK: - Misc
     
     /// Expands the menu items to present them
-    public func presentMenuItems() {
+    public func presentMenuItems(animated: Bool = true) {
         if !isAnimating && !isExpanded {
-            expandMenuItems()
+            expandMenuItems(animated: animated)
         }
     }
     
     /// Folds the menu items to dismiss them
-    public func dismissMenuItems() {
+    public func dismissMenuItems(animated: Bool = true) {
         if !isAnimating && isExpanded {
-            foldMenuItems()
+            foldMenuItems(animated: animated)
         }
     }
     

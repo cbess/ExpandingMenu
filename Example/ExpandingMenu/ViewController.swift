@@ -31,10 +31,12 @@ class ViewController: UIViewController {
         contentView.addSubview(menuButton)
         
         // add layout constraints
-        menuButton.widthAnchor.constraint(equalToConstant: menuButtonSize.width).isActive = true
-        menuButton.heightAnchor.constraint(equalToConstant: menuButtonSize.height).isActive = true
-        menuButton.rightAnchor.constraint(equalTo: contentView.rightAnchor).isActive = true
-        menuButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor).isActive = true
+        NSLayoutConstraint.activate([
+            menuButton.widthAnchor.constraint(equalToConstant: menuButtonSize.width),
+            menuButton.heightAnchor.constraint(equalToConstant: menuButtonSize.height),
+            menuButton.rightAnchor.constraint(equalTo: contentView.rightAnchor),
+            menuButton.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
+            ])
         
         func showAlert(_ title: String) {
             let alert = UIAlertController(title: title, message: nil, preferredStyle: .alert)
