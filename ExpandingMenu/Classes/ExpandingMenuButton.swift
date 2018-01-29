@@ -584,12 +584,16 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     /// Expands the menu items to present them
     public func presentMenuItems() {
-        expandMenuItems()
+        if !isAnimating && !isExpanded {
+            expandMenuItems()
+        }
     }
     
     /// Folds the menu items to dismiss them
     public func dismissMenuItems() {
-        foldMenuItems()
+        if !isAnimating && isExpanded {
+            foldMenuItems()
+        }
     }
     
     // MARK: - Touch Event
