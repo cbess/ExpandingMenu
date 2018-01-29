@@ -417,7 +417,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
 
     // MARK: - Expand Menu Items
     
-    fileprivate func expandMenuItems() {
+    fileprivate func expandMenuItems(animated: Bool = true) {
         willPresentMenuItems?(self)
         isAnimating = true
         
@@ -438,7 +438,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         insertSubview(bottomView, belowSubview: centerButton)
         
         // center button rotation animation
-        if enabledExpandingAnimations.contains(.menuButtonRotation) {
+        if animated, enabledExpandingAnimations.contains(.menuButtonRotation) {
             UIView.animate(withDuration: menuAnimationDuration) {
                 self.centerButton.transform = CGAffineTransform(rotationAngle: CGFloat(-0.5 * Float.pi))
             }
@@ -450,7 +450,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         let currentAngle: CGFloat = 90.0
         
         var lastDistance: CGFloat = 0.0
-        var lastItemSize: CGSize = centerButton.bounds.size
+        var lastItemSize = centerButton.bounds.size
         
         for (index, item) in menuItems.enumerated() {
             item.delegate = self
@@ -463,25 +463,27 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             
             insertSubview(item, belowSubview: centerButton)
             
-            // expand animation
             let distance: CGFloat = makeDistanceFromCenterButton(item.bounds.size, lastDistance: lastDistance, lastItemSize: lastItemSize)
             lastDistance = distance
             lastItemSize = item.bounds.size
-            let endPoint: CGPoint = makeEndPoint(distance, angle: currentAngle / 180.0)
-            let farPoint: CGPoint = makeEndPoint(distance + 10.0, angle: currentAngle / 180.0)
-            let nearPoint: CGPoint = makeEndPoint(distance - 5.0, angle: currentAngle / 180.0)
+            let endPoint = makeEndPoint(distance, angle: currentAngle / 180.0)
+            let farPoint = makeEndPoint(distance + 10.0, angle: currentAngle / 180.0)
+            let nearPoint = makeEndPoint(distance - 5.0, angle: currentAngle / 180.0)
             
-            let expandingAnimation: CAAnimationGroup = makeExpandingAnimation(startingPoint: item.center, farPoint: farPoint, nearPoint: nearPoint, endPoint: endPoint)
+            if animated {
+                // expand animation
+                let expandingAnimation = makeExpandingAnimation(startingPoint: item.center, farPoint: farPoint, nearPoint: nearPoint, endPoint: endPoint)
+                
+                item.layer.add(expandingAnimation, forKey: "expandingAnimation")
+            }
             
-            item.layer.add(expandingAnimation, forKey: "expandingAnimation")
             item.center = endPoint
-            
-            // Add Title Button
             item.titleTappedActionEnabled = titleTappedActionEnabled
             
+            // Add Title Button
             if let titleButton = item.titleButton {
                 titleButton.center = endPoint
-                let margin: CGFloat = item.titleMargin
+                let margin = item.titleMargin
                 
                 let originX: CGFloat
                 
@@ -499,18 +501,27 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
                 
                 insertSubview(titleButton, belowSubview: centerButton)
                 
-                UIView.animate(withDuration: 0.3) {
-                    titleButton.alpha = 1.0
+                if animated {
+                    UIView.animate(withDuration: 0.3) {
+                        titleButton.alpha = 1.0
+                    }
+                } else {
+                    titleButton.alpha = 1
                 }
             }
         }
         
-        // show bottom view alpha animation
-        UIView.animate(withDuration: menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
-            self.bottomView.effect = UIBlurEffect(style: self.bottomViewBlurEffectStyle)
-        }, completion: { _ in
-            self.didExpand()
-        })
+        if animated {
+            // show bottom view alpha animation
+            UIView.animate(withDuration: menuAnimationDuration, delay: 0.0, options: .curveEaseIn, animations: { () -> Void in
+                self.bottomView.effect = UIBlurEffect(style: self.bottomViewBlurEffectStyle)
+            }, completion: { _ in
+                self.didExpand()
+            })
+        } else {
+            bottomView.effect = UIBlurEffect(style: self.bottomViewBlurEffectStyle)
+            didExpand()
+        }
     }
     
     fileprivate func makeExpandingAnimation(startingPoint: CGPoint, farPoint: CGPoint, nearPoint: CGPoint, endPoint: CGPoint) -> CAAnimationGroup {
