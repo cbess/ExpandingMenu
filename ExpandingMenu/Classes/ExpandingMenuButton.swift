@@ -218,7 +218,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             }
         }
         
-        resizeToFoldedFrame {
+        resizeToFoldedFrame(animated: true) {
             self.didFold()
         }
     }
@@ -278,7 +278,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     // MARK: - Fold Menu Items
     
-    fileprivate func foldMenuItems() {
+    fileprivate func foldMenuItems(animated: Bool = true) {
         willDismissMenuItems?(self)
         isAnimating = true
         
@@ -288,39 +288,46 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         
         let currentAngle: CGFloat = 90.0
         var lastDistance: CGFloat = 0.0
-        var lastItemSize: CGSize = centerButton.bounds.size
+        var lastItemSize = centerButton.bounds.size
         
         for item in menuItems {
-            let distance: CGFloat = makeDistanceFromCenterButton(item.bounds.size, lastDistance: lastDistance, lastItemSize: lastItemSize)
+            let distance = makeDistanceFromCenterButton(item.bounds.size, lastDistance: lastDistance, lastItemSize: lastItemSize)
             lastDistance = distance
             lastItemSize = item.bounds.size
-            let backwardPoint: CGPoint = makeEndPoint(distance + 5.0, angle: currentAngle / 180.0)
+            let backwardPoint = makeEndPoint(distance + 5.0, angle: currentAngle / 180.0)
             
-            let foldAnimation: CAAnimationGroup = makeFoldAnimation(startingPoint: item.center, backwardPoint: backwardPoint, endPoint: centerButton.center)
+            if animated {
+                let foldAnimation = makeFoldAnimation(startingPoint: item.center, backwardPoint: backwardPoint, endPoint: centerButton.center)
+                
+                item.layer.add(foldAnimation, forKey: "foldAnimation")
+            }
             
-            item.layer.add(foldAnimation, forKey: "foldAnimation")
             item.center = centerButton.center
             
             // Remove title button
             if let titleButton = item.titleButton {
-                UIView.animate(withDuration: 0.15, animations: { () -> Void in
-                    titleButton.alpha = 0.0
-                    }, completion: { (finished) -> Void in
-                        titleButton.removeFromSuperview()
-                })
+                if animated {
+                    UIView.animate(withDuration: 0.15, animations: { () -> Void in
+                        titleButton.alpha = 0.0
+                        }, completion: { (finished) -> Void in
+                            titleButton.removeFromSuperview()
+                    })
+                } else {
+                    titleButton.removeFromSuperview()
+                }
             }
         }
         
         bringSubview(toFront: centerButton)
         
-        // Resize the ExpandingMenuButton's frame to the foled frame and remove the item buttons
-        resizeToFoldedFrame {
+        // Resize the ExpandingMenuButton's frame to the folded frame and remove the item buttons
+        resizeToFoldedFrame(animated: animated) {
             self.didFold()
         }
     }
     
-    fileprivate func resizeToFoldedFrame(completion: (() -> Void)?) {
-        if enabledFoldingAnimations.contains(.menuButtonRotation) {
+    fileprivate func resizeToFoldedFrame(animated: Bool, completion: (() -> Void)?) {
+        if animated, enabledFoldingAnimations.contains(.menuButtonRotation) {
             UIView.animate(withDuration: menuAnimationDuration, delay: menuAnimationDuration * 0.5, options: .curveEaseIn, animations: { () -> Void in
                 self.centerButton.transform = CGAffineTransform(rotationAngle: 0.0)
                 }, completion: nil)
@@ -328,24 +335,30 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             centerButton.transform = CGAffineTransform(rotationAngle: 0.0)
         }
         
+        let didComplete = { (finished: Bool) in
+            // Remove the items from the superview
+            for item in self.menuItems {
+                item.removeFromSuperview()
+            }
+            
+            // resize the view to the folded state
+            self.frame = CGRect(x: 0.0, y: 0.0, width: self.foldedSize.width, height: self.foldedSize.height)
+            self.center = self.defaultCenterPoint
+            self.centerButton.center = CGPoint(x: self.frame.width / 2.0, y: self.frame.height / 2.0)
+            
+            self.bottomView.removeFromSuperview()
+            
+            completion?()
+        }
+        
         // hide bottom view
-        UIView.animate(withDuration: menuAnimationDuration, delay: menuAnimationDuration * 0.5, options: .curveLinear, animations: { () -> Void in
-            self.bottomView.effect = nil
-            }, completion: { _ in
-                // Remove the items from the superview
-                for item in self.menuItems {
-                    item.removeFromSuperview()
-                }
-                
-                // resize the view to the folded state
-                self.frame = CGRect(x: 0.0, y: 0.0, width: self.foldedSize.width, height: self.foldedSize.height)
-                self.center = self.defaultCenterPoint
-                self.centerButton.center = CGPoint(x: self.frame.width / 2.0, y: self.frame.height / 2.0)
-                
-                self.bottomView.removeFromSuperview()
-
-                completion?()
-        })
+        if animated {
+            UIView.animate(withDuration: menuAnimationDuration, delay: menuAnimationDuration * 0.5, options: .curveLinear, animations: { () -> Void in
+                self.bottomView.effect = nil
+                }, completion: didComplete)
+        } else {
+            didComplete(true)
+        }
     }
     
     fileprivate func makeFoldAnimation(startingPoint: CGPoint, backwardPoint: CGPoint, endPoint: CGPoint) -> CAAnimationGroup {
