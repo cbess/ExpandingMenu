@@ -300,6 +300,11 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
                 let foldAnimation = makeFoldAnimation(startingPoint: item.center, backwardPoint: backwardPoint, endPoint: centerButton.center)
                 
                 item.layer.add(foldAnimation, forKey: "foldAnimation")
+                
+                // ensure that the item opacity remains after the animation is complete
+                if enabledFoldingAnimations.contains(.menuItemFade) {
+                    item.alpha = 0
+                }
             }
             
             item.center = centerButton.center
@@ -363,13 +368,13 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     fileprivate func makeFoldAnimation(startingPoint: CGPoint, backwardPoint: CGPoint, endPoint: CGPoint) -> CAAnimationGroup {
         let animationDuration = menuAnimationDuration * 0.9 // make it close a bit faster, than opening
-        let animationGroup: CAAnimationGroup = CAAnimationGroup()
+        let animationGroup = CAAnimationGroup()
         animationGroup.animations = []
         animationGroup.duration = animationDuration
         
         // Configure rotation animation
         if enabledFoldingAnimations.contains(.menuItemRotation) {
-            let rotationAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
+            let rotationAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, Double.pi, Double.pi * 2.0]
             rotationAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
             rotationAnimation.duration = animationDuration
@@ -378,10 +383,8 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // Configure moving animation
-        let movingAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "position")
-        
-        // Create moving path
-        let path: CGMutablePath = CGMutablePath()
+        let movingAnimation = CAKeyframeAnimation(keyPath: "position")
+        let path = CGMutablePath()
         
         if enabledFoldingAnimations.contains([.menuItemMoving, .menuItemBound]) {
             path.move(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
@@ -413,8 +416,8 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         // Configure fade animation
         if enabledFoldingAnimations.contains(.menuItemFade) {
             let fadeAnimation = CAKeyframeAnimation(keyPath: "opacity")
-            fadeAnimation.values = [1.0, 0.0]
-            fadeAnimation.keyTimes = [0.0, 0.75, 1.0]
+            fadeAnimation.values = [1.0, 0.25, 0.1, 0.0]
+            fadeAnimation.keyTimes = [0.0, 0.5, 0.75, 1.0]
             fadeAnimation.duration = animationDuration
             animationGroup.animations?.append(fadeAnimation)
         }
@@ -444,7 +447,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         defaultCenterPoint = center
         
         // Resize the frame
-        frame = CGRect(x: 0.0, y: 0.0, width: expandingSize.width, height: expandingSize.height)
+        frame = CGRect(origin: .zero, size: expandingSize)
         center = CGPoint(x: expandingSize.width / 2.0, y: expandingSize.height / 2.0)
         bottomView.frame = frame
         
@@ -539,13 +542,13 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     
     fileprivate func makeExpandingAnimation(startingPoint: CGPoint, farPoint: CGPoint, nearPoint: CGPoint, endPoint: CGPoint) -> CAAnimationGroup {
         let animationDuration = menuAnimationDuration
-        let animationGroup: CAAnimationGroup = CAAnimationGroup()
+        let animationGroup = CAAnimationGroup()
         animationGroup.animations = []
         animationGroup.duration = animationDuration
         
         // Configure rotation animation
         if enabledExpandingAnimations.contains(.menuItemRotation) {
-            let rotationAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
+            let rotationAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, -Double.pi, -Double.pi * 1.5, -Double.pi  * 2.0]
             rotationAnimation.duration = animationDuration
             rotationAnimation.keyTimes = [0.0, 0.3, 0.6, 1.0]
@@ -554,10 +557,8 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
         
         // Configure moving animation
-        let movingAnimation: CAKeyframeAnimation = CAKeyframeAnimation(keyPath: "position")
-        
-        // Create moving path
-        let path: CGMutablePath = CGMutablePath()
+        let movingAnimation = CAKeyframeAnimation(keyPath: "position")
+        let path = CGMutablePath()
         
         if enabledExpandingAnimations.contains([.menuItemMoving, .menuItemBound]) {
             path.move(to: CGPoint(x: startingPoint.x, y: startingPoint.y))
