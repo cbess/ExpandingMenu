@@ -160,13 +160,13 @@ open class ExpandingMenuItem: UIView {
     
     // MARK: - Tapped Action
     
-    func titleTapped() {
+    @objc func titleTapped() {
         if titleTappedActionEnabled {
             tapped()
         }
     }
     
-    func tapped() {
+    @objc func tapped() {
         delegate?.menuItemTapped(self)
         tappedAction?()
     }
