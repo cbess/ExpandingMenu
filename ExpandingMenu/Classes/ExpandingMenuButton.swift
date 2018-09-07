@@ -76,8 +76,8 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
     public var expandingDirection: ExpandingDirection = .top
     public var menuTitleDirection: MenuTitleDirection = .left
     
-    public var enabledExpandingAnimations: AnimationOptions = .normal
-    public var enabledFoldingAnimations: AnimationOptions = .normal
+    public var enabledExpandingAnimations = ExpandingMenu.AnimationOptions.normal
+    public var enabledFoldingAnimations = ExpandingMenu.AnimationOptions.normal
     
     /// Indicates if the button is expanded/presented
     public fileprivate(set) var isExpanded: Bool = false
