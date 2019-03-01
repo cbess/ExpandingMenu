@@ -69,7 +69,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         }
     }
     
-    public var bottomViewBlurEffectStyle: UIBlurEffectStyle = .regular
+    public var bottomViewBlurEffectStyle: UIBlurEffect.Style = .regular
     
     public var titleTappedActionEnabled: Bool = true
     
@@ -323,7 +323,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
             }
         }
         
-        bringSubview(toFront: centerButton)
+        bringSubviewToFront(centerButton)
         
         // Resize the ExpandingMenuButton's frame to the folded frame and remove the item buttons
         resizeToFoldedFrame(animated: animated) {
@@ -376,7 +376,7 @@ open class ExpandingMenuButton: UIView, UIGestureRecognizerDelegate {
         if enabledFoldingAnimations.contains(.menuItemRotation) {
             let rotationAnimation = CAKeyframeAnimation(keyPath: "transform.rotation.z")
             rotationAnimation.values = [0.0, Double.pi, Double.pi * 2.0]
-            rotationAnimation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionLinear)
+            rotationAnimation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.linear)
             rotationAnimation.duration = animationDuration
             
             animationGroup.animations?.append(rotationAnimation)
